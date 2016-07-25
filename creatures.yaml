@@ -1,0 +1,57 @@
+ElementalAttributes:
+  - Fire
+  - Water
+
+MinimumInitialMoves : 1
+MaximumMoves : 3
+XPGain : Level * 10
+
+CreatureMajorClasses :
+  Water Fairy :
+    Elemental : Water
+    Moves :
+      Splash :
+        LearnProbability : 1
+
+      Tidal Wave :
+        LearnProbability : Level * 0.1
+
+    CreatureMinorClasses :
+      Young Water Fairy :
+        Attack : Attack + 25 * Level + gaus(0, 10)
+        Defense : Defense + 25 * Level + gaus(0, 10)
+        HP : HP + 25 * Level + gaus(0, 2)
+        MP : MP + 25 * Level + gaus(0, 2)
+        Moves :
+          Rain :
+            LearnProbability : 1
+
+Moves :
+  Attack :
+    Splash :
+      Description : Splashes your enemy with water
+      ElementalAttribute : Water
+      MPBurn : 1
+      HPImpact : Level * 2 + gaus(0, 2)
+    
+    Tidal Wave :
+      Description : Casts a tidal wave at your enemy
+      ElementalAttribute : Water
+      MPBurn : 10
+      HPImpact : Level * 10 + gaus(0, 2)
+
+  Defend :
+    Defend1 :
+      Description : Defend1 Description
+      ElementalAttribute : Element1
+      MPBurn : 1
+      BlockProbability : 0.1
+
+  Attribute :
+    Rain :
+      Description : Reinvigorates the caster
+      ElementalAttribute : Water
+      MPBurn : 5
+      EffectDuration : Battle
+      EffectedAttribute : HP
+      AttributeImpact : Caster_HP * 1.1

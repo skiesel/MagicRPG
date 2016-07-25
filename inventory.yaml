@@ -1,0 +1,9 @@
+Items :
+  CaptureCrystal :
+    Description : Crystal for capturing creatures
+
+  ManaPotion :
+    Description : Potion for replenishing a small amount of MP
+
+  LargeManaPotion :
+    Description : Potion for replenishing a large amount of MP

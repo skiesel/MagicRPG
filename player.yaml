@@ -1,0 +1,29 @@
+Skills :
+  Capture :
+    ManaBurn : 1
+    Probability : expression
+  Restore :
+    ManaBurn : 1
+    Probability : expression
+  Revive :
+    ManaBurn : 1
+    Probability : expression
+
+InventorySize : expression
+
+MP : expression
+
+DefaultCreatureOptions :
+  - Creature1
+  - Creature2
+  - Creature3
+
+Creatures :
+  Min : 1
+  Max : 25
+
+ActiveCreatures : 
+  Min : 1
+  Max : 3
+
+XPGain : expression
