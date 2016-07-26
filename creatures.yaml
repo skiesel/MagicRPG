@@ -56,5 +56,5 @@ Moves :
       ElementalAttribute : Water
       MPBurn : 5
       EffectDuration : Battle
-      EffectedAttribute : HP
+      AffectedAttribute : HP
       AttributeImpact : Caster_HP * 1.1

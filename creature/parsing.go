@@ -78,6 +78,6 @@ type DefenseMove struct {
 type AttributeMove struct {
 	GeneralMove       `yaml:",inline"`
 	EffectDuration    string `yaml:"EffectDuration"`
-	EffectedAttribute string `yaml:"EffectedAttribute"`
+	AffectedAttribute string `yaml:"AffectedAttribute"`
 	AttributeImpact   string `yaml:"AttributeImpact"`
 }

@@ -14,7 +14,7 @@ import (
 )
 
 type BattleEffect struct {
-	EffectedAttribute string
+	AffectedAttribute string
 	Impact int
 	Turns int
 }
@@ -67,7 +67,7 @@ func ExecuteAttributeMove(casterPlayer, targetPlayer *player.Player, casterCreat
 	}
 
 	return BattleEffect {
-		EffectedAttribute : move.EffectedAttribute,
+		AffectedAttribute : move.AffectedAttribute,
 		Impact : int(attributeImpactValue),
 		Turns : turns,
 	}
