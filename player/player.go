@@ -8,6 +8,7 @@ import (
 type Player struct {
 	Name      string
 	Level     int
+	MP        int
 	XP        int
 	Inventory []struct {
 		Quantity int

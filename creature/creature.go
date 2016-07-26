@@ -16,7 +16,7 @@ type Creature struct {
 	HP         int
 	MP         int
 	XP         int
-	Moves      []string
+	Moves      map[string]string
 }
 
 func SpawnCreature(majorClass, minorClass string, level int) *Creature {
@@ -66,7 +66,7 @@ func SpawnCreature(majorClass, minorClass string, level int) *Creature {
 	return creature
 }
 
-func generateMoves(majorClass, minorClass string, level int) []string {
+func generateMoves(majorClass, minorClass string, level int) map[string]string {
 	majorCreatureClass := creatureConfig.CreatureMajorClasses[majorClass]
 	minorCreatureClass := majorCreatureClass.CreatureMinorClasses[minorClass]
 
@@ -83,7 +83,7 @@ func generateMoves(majorClass, minorClass string, level int) []string {
 		"Level": float64(level),
 	}
 
-	learnedMoves := []string{}
+	learnedMoves := map[string]string{}
 
 	// the unorderedness of the maps gives this a little diversity
 	for len(learnedMoves) < creatureConfig.MinimumInitialMoves {
@@ -91,7 +91,7 @@ func generateMoves(majorClass, minorClass string, level int) []string {
 			expression := utils.ParseExpression(probability)
 			probabilityValue := utils.EvaluateExpression(expression, variableDefinitions)
 			if rand.Float64() <= probabilityValue {
-				learnedMoves = append(learnedMoves, move)
+				learnedMoves[move] = move
 				if len(learnedMoves) >= creatureConfig.MaximumMoves {
 					break
 				}
@@ -124,4 +124,28 @@ func (creature *Creature) levelUp() {
 
 	expression = utils.ParseExpression(creatureClass.MP)
 	creature.MP = int(utils.EvaluateExpression(expression, variableDefinitions))
+}
+
+func (creature *Creature) GetAttackMove(move string) AttackMove {
+	m, found := creatureConfig.Moves.Attack[move]
+	if !found {
+		panic("could not find attack move")
+	}
+	return m
+}
+
+func (creature *Creature) GetDefenseMove(move string) DefenseMove {
+	m, found := creatureConfig.Moves.Defend[move]
+	if !found {
+		panic("could not find defense move")
+	}
+	return m
+}
+
+func (creature *Creature) GetAttributeMove(move string) AttributeMove {
+	m, found := creatureConfig.Moves.Attribute[move]
+	if !found {
+		panic("could not find attribute move")
+	}
+	return m
 }

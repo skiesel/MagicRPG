@@ -5,6 +5,7 @@ import (
 
 	"github.com/skiesel/MagicRPG/creature"
 	"github.com/skiesel/MagicRPG/player"
+	"github.com/skiesel/MagicRPG/battle"
 )
 
 func main() {
@@ -16,4 +17,6 @@ func main() {
 
 	fmt.Println(player1.Creatures[0])
 	fmt.Println(player2.Creatures[0])
+
+	fmt.Println(battle.BattleEffect{})
 }

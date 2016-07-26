@@ -16,6 +16,9 @@ CreatureMajorClasses :
       Tidal Wave :
         LearnProbability : Level * 0.1
 
+      Vortex : 
+        LearnProbability : Level * 0.25
+
     CreatureMinorClasses :
       Young Water Fairy :
         Attack : Attack + 25 * Level + gaus(0, 10)
@@ -41,11 +44,11 @@ Moves :
       HPImpact : Level * 10 + gaus(0, 2)
 
   Defend :
-    Defend1 :
-      Description : Defend1 Description
-      ElementalAttribute : Element1
-      MPBurn : 1
-      BlockProbability : 0.1
+    Vortex :
+      Description : Create a vortex of protection
+      ElementalAttribute : Water
+      MPBurn : 3
+      BlockProbability : 0.25
 
   Attribute :
     Rain :

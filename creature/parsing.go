@@ -49,21 +49,14 @@ type CreatureConfig struct {
 	} `yaml:"CreatureMajorClasses"`
 
 	Moves struct {
-		Attack map[string]struct {
-			GeneralMove `yaml:",inline"`
-			HPImpact    string `yaml:"HPImpact"`
-		} `yaml:"Attack"`
-		Defend map[string]struct {
-			GeneralMove      `yaml:",inline"`
-			BlockProbability string `yaml:"BlockProbability"`
-		} `yaml:"Defend"`
-		Attribute map[string]struct {
-			GeneralMove       `yaml:",inline"`
-			EffectDuration    string `yaml:"EffectDuration"`
-			EffectedAttribute string `yaml:"EffectedAttribute"`
-			AttributeImpact   string `yaml:"AttributeImpact"`
-		} `yaml:"Attribute"`
+		Attack map[string]AttackMove `yaml:"Attack"`
+		Defend map[string]DefenseMove `yaml:"Defend"`
+		Attribute map[string]AttributeMove `yaml:"Attribute"`
 	} `yaml:"Moves"`
+}
+
+type LearnedMove struct {
+	LearnProbability string `yaml:"LearnProbability"`
 }
 
 type GeneralMove struct {
@@ -72,6 +65,19 @@ type GeneralMove struct {
 	MPBurn             int    `yaml:"MPBurn"`
 }
 
-type LearnedMove struct {
-	LearnProbability string `yaml:"LearnProbability"`
+type AttackMove struct {
+	GeneralMove `yaml:",inline"`
+	HPImpact    string `yaml:"HPImpact"`
+}
+
+type DefenseMove struct {
+	GeneralMove      `yaml:",inline"`
+	BlockProbability string `yaml:"BlockProbability"`
+}
+
+type AttributeMove struct {
+	GeneralMove       `yaml:",inline"`
+	EffectDuration    string `yaml:"EffectDuration"`
+	EffectedAttribute string `yaml:"EffectedAttribute"`
+	AttributeImpact   string `yaml:"AttributeImpact"`
 }
