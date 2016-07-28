@@ -7,16 +7,17 @@ import (
 )
 
 type Creature struct {
-	Name       string
-	MajorClass string
-	MinorClass string
-	Level      int
-	Attack     int
-	Defense    int
-	HP         int
-	MP         int
-	XP         int
-	Moves      map[string]string
+	Name           string
+	MajorClass     string
+	MinorClass     string
+	Level          int
+	Attack         int
+	Defense        int
+	HP             int
+	MP             int
+	XP             int
+	EvolutionLevel int
+	Moves          map[string]string
 }
 
 func SpawnCreature(majorClass, minorClass string, level int) *Creature {
@@ -50,17 +51,21 @@ func SpawnCreature(majorClass, minorClass string, level int) *Creature {
 	expression = utils.ParseExpression(creatureClass.MP)
 	mp := utils.EvaluateExpression(expression, variableDefinitions)
 
+	expression = utils.ParseExpression(creatureClass.EvolutionLevel)
+	evolutionLevel := utils.EvaluateExpression(expression, variableDefinitions)
+
 	creature := &Creature{
-		Name:       minorClass,
-		MajorClass: majorClass,
-		MinorClass: minorClass,
-		Level:      level,
-		Attack:     int(attack),
-		Defense:    int(defense),
-		HP:         int(hp),
-		MP:         int(mp),
-		Moves:      generateMoves(majorClass, minorClass, level),
-		XP:         0,
+		Name:           minorClass,
+		MajorClass:     majorClass,
+		MinorClass:     minorClass,
+		Level:          level,
+		Attack:         int(attack),
+		Defense:        int(defense),
+		HP:             int(hp),
+		MP:             int(mp),
+		EvolutionLevel: int(evolutionLevel),
+		Moves:          generateMoves(majorClass, minorClass, level),
+		XP:             0,
 	}
 
 	return creature
@@ -103,8 +108,26 @@ func generateMoves(majorClass, minorClass string, level int) map[string]string {
 }
 
 func (creature *Creature) levelUp() {
-	creatureClass := creatureConfig.CreatureMajorClasses[creature.MajorClass].CreatureMinorClasses[creature.MinorClass]
 	creature.Level += 1
+
+	evolved := false
+
+	if creature.Level == creature.EvolutionLevel {
+		//Prompt before leveling up, but for now, level up by default
+
+		for i, class := range creatureConfig.CreatureMajorClasses[creature.MajorClass].EvolutionProgression {
+			if creature.MinorClass == class {
+				i++
+				if i < len(creatureConfig.CreatureMajorClasses[creature.MajorClass].EvolutionProgression) {
+					creature.MinorClass = creatureConfig.CreatureMajorClasses[creature.MajorClass].EvolutionProgression[i]
+					evolved = true
+				}
+				break
+			}
+		}
+	}
+
+	creatureClass := creatureConfig.CreatureMajorClasses[creature.MajorClass].CreatureMinorClasses[creature.MinorClass]
 
 	variableDefinitions := map[string]float64{
 		"Level":   float64(creature.Level),
@@ -124,6 +147,14 @@ func (creature *Creature) levelUp() {
 
 	expression = utils.ParseExpression(creatureClass.MP)
 	creature.MP = int(utils.EvaluateExpression(expression, variableDefinitions))
+
+	if evolved {
+		expression = utils.ParseExpression(creatureClass.EvolutionLevel)
+		creature.EvolutionLevel = int(utils.EvaluateExpression(expression, variableDefinitions))
+		if creature.EvolutionLevel <= creature.Level {
+			creature.EvolutionLevel = creature.Level + 1
+		}
+	}
 }
 
 func (creature *Creature) GetAttackMove(move string) AttackMove {

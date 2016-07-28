@@ -1,3 +1,10 @@
+# Water Fairy - Water
+# Wood Nymph - Ground
+# Fire Pixie - Fire
+# Wind Sprite - Wind
+# Imp - Physical
+# Haunt - Dark
+
 ElementalAttributes:
   - Fire
   - Water
@@ -19,12 +26,25 @@ CreatureMajorClasses :
       Vortex : 
         LearnProbability : Level * 0.25
 
+      EvolutionProgression : [Young Water Fairy, Elder Water Fairy]
+
     CreatureMinorClasses :
       Young Water Fairy :
         Attack : Attack + 25 * Level + gaus(0, 10)
         Defense : Defense + 25 * Level + gaus(0, 10)
         HP : HP + 25 * Level + gaus(0, 2)
         MP : MP + 25 * Level + gaus(0, 2)
+        EvolutionLevel : 10 + gaus(0, 1)
+        Moves :
+          Rain :
+            LearnProbability : 1
+        
+      Elder Water Fairy :
+        Attack : Attack + 25 * Level + gaus(0, 10)
+        Defense : Defense + 25 * Level + gaus(0, 10)
+        HP : HP + 25 * Level + gaus(0, 2)
+        MP : MP + 25 * Level + gaus(0, 2)
+        EvolutionLevel : -1
         Moves :
           Rain :
             LearnProbability : 1
