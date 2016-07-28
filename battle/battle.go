@@ -22,6 +22,9 @@ type BattleEffect struct {
 func ExecuteAttackMove(casterPlayer, targetPlayer *player.Player, casterCreature, targetCreature *creature.Creature, casterMove string) {
 	move := casterCreature.GetAttackMove(casterMove)
 	casterCreature.MP -= move.MPBurn
+	if casterCreature.MP < 0 {
+		panic("insufficient MP for attack move!")
+	}
 
 	expression := utils.ParseExpression(move.HPImpact)
 
@@ -29,12 +32,19 @@ func ExecuteAttackMove(casterPlayer, targetPlayer *player.Player, casterCreature
 
 	targetCreature.HP -= int(utils.EvaluateExpression(expression, variableDefinitions))
 
+	if targetCreature.HP < 0 {
+		targetCreature.HP = 0
+	}
+
 	//side effects?
 }
 
 func ExecuteDefenseMove(casterPlayer, targetPlayer *player.Player, casterCreature, targetCreature *creature.Creature, casterMove string) bool {
 	move := casterCreature.GetDefenseMove(casterMove)
 	casterCreature.MP -= move.MPBurn
+	if casterCreature.MP < 0 {
+		panic("insufficient MP for defense move!")
+	}
 
 	expression := utils.ParseExpression(move.BlockProbability)
 
@@ -48,6 +58,9 @@ func ExecuteDefenseMove(casterPlayer, targetPlayer *player.Player, casterCreatur
 func ExecuteAttributeMove(casterPlayer, targetPlayer *player.Player, casterCreature, targetCreature *creature.Creature, casterMove string) BattleEffect {
 	move := casterCreature.GetAttributeMove(casterMove)
 	casterCreature.MP -= move.MPBurn
+	if casterCreature.MP < 0 {
+		panic("insufficient MP for attribute move!")
+	}
 
 	expression := utils.ParseExpression(move.AttributeImpact)
 
