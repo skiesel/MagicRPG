@@ -39,10 +39,11 @@ type CreatureConfig struct {
 	CreatureMajorClasses map[string]struct {
 		Elemental            string                 `yaml:"Elemental"`
 		Moves                map[string]LearnedMove `yaml:"Moves"`
-		EvolutionProgression     []string `yaml:"EvolutionProgression"`
+		EvolutionProgression []string               `yaml:"EvolutionProgression"`
 		CreatureMinorClasses map[string]struct {
 			Attack         string                 `yaml:"Attack"`
 			Defense        string                 `yaml:"Defense"`
+			Evade          string                 `yaml:"Evade"`
 			HP             string                 `yaml:"HP"`
 			MP             string                 `yaml:"MP"`
 			EvolutionLevel string                 `yaml:"EvolutionLevel"`

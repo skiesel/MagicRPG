@@ -13,6 +13,7 @@ type Creature struct {
 	Level          int
 	Attack         int
 	Defense        int
+	Evade          int
 	HP             int
 	MP             int
 	XP             int
@@ -31,130 +32,20 @@ func SpawnCreature(majorClass, minorClass string, level int) *Creature {
 
 	creatureClass := creatureConfig.CreatureMajorClasses[majorClass].CreatureMinorClasses[minorClass]
 
-	variableDefinitions := map[string]float64{
-		"Level":   float64(level),
-		"Attack":  0,
-		"Defense": 0,
-		"HP":      0,
-		"MP":      0,
-	}
-	expression := utils.ParseExpression(creatureClass.Attack)
-
-	attack := utils.EvaluateExpression(expression, variableDefinitions)
-
-	expression = utils.ParseExpression(creatureClass.Defense)
-	defense := utils.EvaluateExpression(expression, variableDefinitions)
-
-	expression = utils.ParseExpression(creatureClass.HP)
-	hp := utils.EvaluateExpression(expression, variableDefinitions)
-
-	expression = utils.ParseExpression(creatureClass.MP)
-	mp := utils.EvaluateExpression(expression, variableDefinitions)
-
-	expression = utils.ParseExpression(creatureClass.EvolutionLevel)
-	evolutionLevel := utils.EvaluateExpression(expression, variableDefinitions)
-
 	creature := &Creature{
-		Name:           minorClass,
-		MajorClass:     majorClass,
-		MinorClass:     minorClass,
-		Level:          level,
-		Attack:         int(attack),
-		Defense:        int(defense),
-		HP:             int(hp),
-		MP:             int(mp),
-		EvolutionLevel: int(evolutionLevel),
-		Moves:          generateMoves(majorClass, minorClass, level),
-		XP:             0,
+		Name:       minorClass,
+		MajorClass: majorClass,
+		MinorClass: minorClass,
+		Level:      level,
 	}
+
+	creature.generateMoves()
+	creature.generateStats()
+
+	expression := utils.ParseExpression(creatureClass.EvolutionLevel)
+	creature.EvolutionLevel = int(utils.EvaluateExpression(expression, creature.getStatsAsMap()))
 
 	return creature
-}
-
-func generateMoves(majorClass, minorClass string, level int) map[string]string {
-	majorCreatureClass := creatureConfig.CreatureMajorClasses[majorClass]
-	minorCreatureClass := majorCreatureClass.CreatureMinorClasses[minorClass]
-
-	moves := map[string]string{}
-
-	for key, val := range majorCreatureClass.Moves {
-		moves[key] = val.LearnProbability
-	}
-	for key, val := range minorCreatureClass.Moves {
-		moves[key] = val.LearnProbability
-	}
-
-	variableDefinitions := map[string]float64{
-		"Level": float64(level),
-	}
-
-	learnedMoves := map[string]string{}
-
-	// the unorderedness of the maps gives this a little diversity
-	for len(learnedMoves) < creatureConfig.MinimumInitialMoves {
-		for move, probability := range moves {
-			expression := utils.ParseExpression(probability)
-			probabilityValue := utils.EvaluateExpression(expression, variableDefinitions)
-			if rand.Float64() <= probabilityValue {
-				learnedMoves[move] = move
-				if len(learnedMoves) >= creatureConfig.MaximumMoves {
-					break
-				}
-			}
-		}
-	}
-
-	return learnedMoves
-}
-
-func (creature *Creature) levelUp() {
-	creature.Level += 1
-
-	evolved := false
-
-	if creature.Level == creature.EvolutionLevel {
-		//Prompt before leveling up, but for now, level up by default
-
-		for i, class := range creatureConfig.CreatureMajorClasses[creature.MajorClass].EvolutionProgression {
-			if creature.MinorClass == class {
-				i++
-				if i < len(creatureConfig.CreatureMajorClasses[creature.MajorClass].EvolutionProgression) {
-					creature.MinorClass = creatureConfig.CreatureMajorClasses[creature.MajorClass].EvolutionProgression[i]
-					evolved = true
-				}
-				break
-			}
-		}
-	}
-
-	creatureClass := creatureConfig.CreatureMajorClasses[creature.MajorClass].CreatureMinorClasses[creature.MinorClass]
-
-	variableDefinitions := map[string]float64{
-		"Level":   float64(creature.Level),
-		"Attack":  float64(creature.Attack),
-		"Defense": float64(creature.Defense),
-		"HP":      float64(creature.HP),
-		"MP":      float64(creature.MP),
-	}
-	expression := utils.ParseExpression(creatureClass.Attack)
-	creature.Attack = int(utils.EvaluateExpression(expression, variableDefinitions))
-
-	expression = utils.ParseExpression(creatureClass.Defense)
-	creature.Defense = int(utils.EvaluateExpression(expression, variableDefinitions))
-
-	expression = utils.ParseExpression(creatureClass.HP)
-	creature.HP = int(utils.EvaluateExpression(expression, variableDefinitions))
-
-	expression = utils.ParseExpression(creatureClass.MP)
-	creature.MP = int(utils.EvaluateExpression(expression, variableDefinitions))
-
-	if evolved {
-		expression = utils.ParseExpression(creatureClass.EvolutionLevel)
-		creature.EvolutionLevel = int(utils.EvaluateExpression(expression, variableDefinitions))
-		if creature.EvolutionLevel <= creature.Level {
-			creature.EvolutionLevel = creature.Level + 1
-		}
-	}
 }
 
 func (creature *Creature) GetAttackMove(move string) AttackMove {
@@ -179,4 +70,97 @@ func (creature *Creature) GetAttributeMove(move string) AttributeMove {
 		panic("could not find attribute move")
 	}
 	return m
+}
+
+func (creature *Creature) generateMoves() {
+	majorCreatureClass := creatureConfig.CreatureMajorClasses[creature.MajorClass]
+	minorCreatureClass := majorCreatureClass.CreatureMinorClasses[creature.MinorClass]
+
+	moves := map[string]string{}
+
+	for key, val := range majorCreatureClass.Moves {
+		moves[key] = val.LearnProbability
+	}
+	for key, val := range minorCreatureClass.Moves {
+		moves[key] = val.LearnProbability
+	}
+
+	variableDefinitions := creature.getStatsAsMap()
+
+	// the unorderedness of the maps gives this a little diversity
+	for len(creature.Moves) < creatureConfig.MinimumInitialMoves {
+		for move, probability := range moves {
+			expression := utils.ParseExpression(probability)
+			probabilityValue := utils.EvaluateExpression(expression, variableDefinitions)
+			if rand.Float64() <= probabilityValue {
+				creature.Moves[move] = move
+				if len(creature.Moves) >= creatureConfig.MaximumMoves {
+					break
+				}
+			}
+		}
+	}
+}
+
+func (creature *Creature) levelUp() {
+	creature.Level += 1
+
+	evolved := false
+
+	if creature.Level == creature.EvolutionLevel {
+		//Prompt before leveling up, but for now, level up by default
+
+		for i, class := range creatureConfig.CreatureMajorClasses[creature.MajorClass].EvolutionProgression {
+			if creature.MinorClass == class {
+				i++
+				if i < len(creatureConfig.CreatureMajorClasses[creature.MajorClass].EvolutionProgression) {
+					creature.MinorClass = creatureConfig.CreatureMajorClasses[creature.MajorClass].EvolutionProgression[i]
+					evolved = true
+				}
+				break
+			}
+		}
+	}
+
+	creature.generateStats()
+
+	if evolved {
+		expression := utils.ParseExpression(creatureConfig.CreatureMajorClasses[creature.MajorClass].CreatureMinorClasses[creature.MinorClass].EvolutionLevel)
+		creature.EvolutionLevel = int(utils.EvaluateExpression(expression, creature.getStatsAsMap()))
+		if creature.EvolutionLevel <= creature.Level {
+			creature.EvolutionLevel = creature.Level + 1
+		}
+	}
+}
+
+func (creature *Creature) generateStats() {
+	creatureClass := creatureConfig.CreatureMajorClasses[creature.MajorClass].CreatureMinorClasses[creature.MinorClass]
+
+	variableDefinitions := creature.getStatsAsMap()
+
+	expression := utils.ParseExpression(creatureClass.Attack)
+	creature.Attack = int(utils.EvaluateExpression(expression, variableDefinitions))
+
+	expression = utils.ParseExpression(creatureClass.Defense)
+	creature.Defense = int(utils.EvaluateExpression(expression, variableDefinitions))
+
+	expression = utils.ParseExpression(creatureClass.Evade)
+	creature.Evade = int(utils.EvaluateExpression(expression, variableDefinitions))
+
+	expression = utils.ParseExpression(creatureClass.HP)
+	creature.HP = int(utils.EvaluateExpression(expression, variableDefinitions))
+
+	expression = utils.ParseExpression(creatureClass.MP)
+	creature.MP = int(utils.EvaluateExpression(expression, variableDefinitions))
+}
+
+func (creature *Creature) getStatsAsMap() map[string]float64 {
+	return map[string]float64{
+		"Level":   float64(creature.Level),
+		"Attack":  float64(creature.Attack),
+		"Defense": float64(creature.Defense),
+		"Evade":   float64(creature.Evade),
+		"HP":      float64(creature.HP),
+		"MP":      float64(creature.MP),
+	}
 }
