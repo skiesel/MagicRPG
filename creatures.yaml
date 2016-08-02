@@ -26,7 +26,7 @@ CreatureMajorClasses :
       Vortex : 
         LearnProbability : Level * 0.25
 
-      EvolutionProgression : [Young Water Fairy, Elder Water Fairy]
+    EvolutionProgression : [Young Water Fairy, Elder Water Fairy]
 
     CreatureMinorClasses :
       Young Water Fairy :

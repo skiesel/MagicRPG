@@ -37,6 +37,7 @@ func SpawnCreature(majorClass, minorClass string, level int) *Creature {
 		MajorClass: majorClass,
 		MinorClass: minorClass,
 		Level:      level,
+		Moves:      map[string]string{},
 	}
 
 	creature.generateMoves()
