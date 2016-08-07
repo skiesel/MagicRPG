@@ -1,22 +1,74 @@
 package battle
 
 import (
+	"bufio"
+	"fmt"
 	"math"
 	"math/rand"
+	"os"
 	"strconv"
 	"strings"
 
-	"github.com/skiesel/MagicRPG/creature"
-	"github.com/skiesel/MagicRPG/player"
-	"github.com/skiesel/MagicRPG/utils"
-
 	"github.com/skiesel/goexpr"
+
+	"creature"
+	"player"
+	"utils"
 )
 
 type BattleEffect struct {
 	AffectedAttribute string
 	Impact int
 	Turns int
+}
+
+func Battle(player1, player2 *player.Player) {
+	reader := bufio.NewReader(os.Stdin)
+	turn := true
+	for player1.Creatures[0].HP > 0 && player2.Creatures[0].HP > 0 {
+		var currentPlayer, otherPlayer *player.Player
+		if turn {
+			fmt.Println("Player 1 Turn")
+			currentPlayer = player1
+			otherPlayer = player2
+		} else {
+			fmt.Println("Player 2 Turn")
+			currentPlayer = player2
+			otherPlayer = player1
+		}
+		turn = !turn
+
+		var move, moveType string
+		for {
+			currentPlayer.ListMoves(0)
+			move, _ = reader.ReadString('\n')
+			move = strings.Replace(move, "\n", "", -1)
+
+			found := false
+			moveType, found = currentPlayer.Creatures[0].Moves[move];
+
+			if found {
+				break
+			}
+
+			fmt.Println("invalid move")
+		}
+		switch moveType {
+			case "Attack":
+				ExecuteAttackMove(currentPlayer, otherPlayer, currentPlayer.Creatures[0], otherPlayer.Creatures[0], move)
+			case "Defense":
+				block := ExecuteDefenseMove(currentPlayer, otherPlayer, currentPlayer.Creatures[0], otherPlayer.Creatures[0], move)
+				if block {
+					fmt.Println("block next attack")
+				}
+			case "Attribute":
+				battleEffect := ExecuteAttributeMove(currentPlayer, otherPlayer, currentPlayer.Creatures[0], otherPlayer.Creatures[0], move)
+				fmt.Println(battleEffect)
+		}
+
+		fmt.Println("1 ", player1.Creatures[0].HP)
+		fmt.Println("2 ", player2.Creatures[0].HP)
+	}
 }
 
 func ExecuteAttackMove(casterPlayer, targetPlayer *player.Player, casterCreature, targetCreature *creature.Creature, casterMove string) {
@@ -69,7 +121,7 @@ func ExecuteAttributeMove(casterPlayer, targetPlayer *player.Player, casterCreat
 	attributeImpactValue := utils.EvaluateExpression(expression, variableDefinitions)
 
 	turns := 0
-	if move.EffectDuration == "battle" {
+	if move.EffectDuration == "Battle" {
 		turns = math.MaxInt32
 	} else {
 		turns64, err := strconv.ParseInt(move.EffectDuration, 10, 32)
@@ -89,20 +141,23 @@ func ExecuteAttributeMove(casterPlayer, targetPlayer *player.Player, casterCreat
 func getVariableDefintions(expression *goexpr.Expression, casterPlayer, targetPlayer *player.Player, casterCreature, targetCreature *creature.Creature) map[string]float64 {
 	variableDefinitions := map[string]float64{}
 	for _, variable := range expression.Vars {
+
+		fmt.Println(variable)
+
 		tokens := strings.Split(variable, "_")
 		if strings.Contains(tokens[0], "Player") {
 			var player *player.Player
-			if strings.Contains(tokens[0], "Caster") {
+			if strings.Contains(tokens[1], "Caster") {
 				player = casterPlayer
-			} else if strings.Contains(tokens[0], "Target") {
+			} else if strings.Contains(tokens[1], "Target") {
 				player = targetPlayer
 			} else {
-				panic("Unreconized player type")
+				panic("Unrecognized player type: " + tokens[0])
 			}
 
-			switch tokens[1] {
+			switch tokens[2] {
 			// case "HP":
-			// 	variableDefinitions[variable] = player.HP
+			//	variableDefinitions[variable] = player.HP
 			case "MP":
 				variableDefinitions[variable] = float64(player.MP)
 			case "Level":
@@ -110,15 +165,15 @@ func getVariableDefintions(expression *goexpr.Expression, casterPlayer, targetPl
 			}
 		} else if strings.Contains(tokens[0], "Creature") {
 			var creature *creature.Creature
-			if strings.Contains(tokens[0], "Caster") {
+			if strings.Contains(tokens[1], "Caster") {
 				creature = casterCreature
-			} else if strings.Contains(tokens[0], "Target") {
+			} else if strings.Contains(tokens[1], "Target") {
 				creature = targetCreature
 			} else {
-				panic("Unreconized creature type")
+				panic("Unrecognized creature type: " + tokens[1])
 			}
 
-			switch tokens[1] {
+			switch tokens[2] {
 			case "HP":
 				variableDefinitions[variable] = float64(creature.HP)
 			case "MP":
@@ -127,7 +182,7 @@ func getVariableDefintions(expression *goexpr.Expression, casterPlayer, targetPl
 				variableDefinitions[variable] = float64(creature.Level)
 			}
 		} else {
-			panic("Unreconized variable type")
+			panic("Unreconized variable type: " + tokens[1])
 		}
 	}
 

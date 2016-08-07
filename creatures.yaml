@@ -57,13 +57,13 @@ Moves :
       Description : Splashes your enemy with water
       ElementalAttribute : Water
       MPBurn : 1
-      HPImpact : Level * 2 + gaus(0, 2)
+      HPImpact : Creature_Caster_Level * 20 + gaus(0, 2)
     
     Tidal Wave :
       Description : Casts a tidal wave at your enemy
       ElementalAttribute : Water
       MPBurn : 10
-      HPImpact : Level * 10 + gaus(0, 2)
+      HPImpact : Creature_Caster_Level * 10 + gaus(0, 2)
 
   Defend :
     Vortex :
@@ -79,4 +79,4 @@ Moves :
       MPBurn : 5
       EffectDuration : Battle
       AffectedAttribute : HP
-      AttributeImpact : Caster_HP * 1.1
+      AttributeImpact : Creature_Caster_HP * 1.1

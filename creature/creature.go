@@ -1,9 +1,10 @@
 package creature
 
 import (
+	"fmt"
 	"math/rand"
 
-	"github.com/skiesel/MagicRPG/utils"
+	"utils"
 )
 
 type Creature struct {
@@ -47,6 +48,22 @@ func SpawnCreature(majorClass, minorClass string, level int) *Creature {
 	creature.EvolutionLevel = int(utils.EvaluateExpression(expression, creature.getStatsAsMap()))
 
 	return creature
+}
+
+func (creature *Creature) ListMoves() {
+	for move, moveType := range creature.Moves {
+		var description string
+		switch moveType {
+		case "Attack":
+			description = creature.GetAttackMove(move).Description
+		case "Defense":
+			description = creature.GetDefenseMove(move).Description
+		case "Attribute":
+			description = creature.GetAttributeMove(move).Description
+		}
+
+		fmt.Println(move, " : ", description)
+	}
 }
 
 func (creature *Creature) GetAttackMove(move string) AttackMove {
@@ -94,7 +111,18 @@ func (creature *Creature) generateMoves() {
 			expression := utils.ParseExpression(probability)
 			probabilityValue := utils.EvaluateExpression(expression, variableDefinitions)
 			if rand.Float64() <= probabilityValue {
-				creature.Moves[move] = move
+				var moveType string
+				if _, found := creatureConfig.Moves.Attack[move]; found {
+					moveType = "Attack"
+				} else if _, found := creatureConfig.Moves.Defend[move]; found {
+					moveType = "Defense"
+				} else if _, found := creatureConfig.Moves.Attribute[move]; found {
+					moveType = "Attribute"
+				} else {
+					fmt.Println("could not resolve move type")
+				}
+
+				creature.Moves[move] = moveType
 				if len(creature.Moves) >= creatureConfig.MaximumMoves {
 					break
 				}

@@ -1,8 +1,8 @@
 package player
 
 import (
-	"github.com/skiesel/MagicRPG/creature"
-	"github.com/skiesel/MagicRPG/inventory"
+	"creature"
+	"inventory"
 )
 
 type Player struct {
@@ -15,4 +15,11 @@ type Player struct {
 		Item     *inventory.Item
 	}
 	Creatures []*creature.Creature
+}
+
+func (player *Player) ListMoves(which int) {
+	if which < 0 || which > len(player.Creatures) {
+		panic("Can't list moves for out of bounds creature")
+	}
+	player.Creatures[which].ListMoves()
 }
