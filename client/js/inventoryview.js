@@ -114,16 +114,16 @@ var InventoryView = (function() {
 			inventoryGroup.add(spriteCounts);
 
 			displayInventoryArray();
+
+			cachedCamera = game.world.camera;
 		},
 
 		update : function() {
-		
+
 		},
 
 		show : function() {
 			inventoryGroup.visible = true;
-			game.world.camera.view.x = 0;
-			game.world.camera.view.y = 0;
 		},
 
 		hide : function() {

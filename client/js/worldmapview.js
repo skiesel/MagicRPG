@@ -1,6 +1,5 @@
 var WorldMapView = (function() {
 	var player, map, mapLayer, cursors, worldViewGroup;
-	var cachedCameraView;
 
 	return {
 		preload : function() {
@@ -54,13 +53,16 @@ var WorldMapView = (function() {
 
 		show : function() {
 			worldViewGroup.visible = true;
-			game.world.camera.view = cachedCameraView;
+			game.camera.follow(player);
 		},
 
 		hide : function() {
 			worldViewGroup.visible = false;
 			player.body.velocity.set(0);
-			cachedCameraView = game.world.camera.view;
+
+			game.camera.unfollow();
+			game.camera.setPosition(0,0);
+			game.camera.update();
 		},
 	}
 
