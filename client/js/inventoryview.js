@@ -1,6 +1,5 @@
-var itemSprites;
-
 var InventoryView = (function() {
+	var itemSprites;
 	var inventoryGroup;
 	var inventoryCells;
 	var inventoryData = [];
@@ -32,8 +31,8 @@ var InventoryView = (function() {
 			for(var i = 0; i < 4; i++) {
 				for(var j = 0; j < 4; j++) {
 					var rectGraphics = inventoryGrid.add(new Phaser.Graphics(game, 0, 0));
-					var x = padding + i * rectWidth + i;
-					var y = padding + j * rectWidth + j;
+					var x = padding * (i+1) + rectWidth * i;
+					var y = padding * (j+1) + rectWidth * j;
 
 					rectGraphics.type = "inventoryItem";
 					rectGraphics.shape = new Phaser.RoundedRectangle(x, y, rectWidth, rectWidth, 10);
@@ -64,10 +63,10 @@ var InventoryView = (function() {
 			}
 
 			var newRectWidth = rectWidth * 3;
-			var startX = totalWidth - newRectWidth;
+			var startX = totalWidth - newRectWidth + padding;
 			for(var i = 0; i < buttonLabelText.length; i++) {
 				var rectGraphics = inventoryGrid.add(new Phaser.Graphics(game, 0, 0));
-				var y = padding + i * rectWidth + i + 1;
+				var y = padding * (i+1) + rectWidth * i;
 				rectGraphics.type = "actionButton";
 				rectGraphics.shape = new Phaser.RoundedRectangle(startX, y, newRectWidth, rectWidth, 10);
 				roundedRectangles.push(rectGraphics);
@@ -114,8 +113,6 @@ var InventoryView = (function() {
 			inventoryGroup.add(spriteCounts);
 
 			displayInventoryArray();
-
-			cachedCamera = game.world.camera;
 		},
 
 		update : function() {

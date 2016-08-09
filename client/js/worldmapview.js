@@ -1,6 +1,7 @@
 var WorldMapView = (function() {
 	var player, map, mapLayer, cursors, worldViewGroup;
 	var shaking = { x : -1, y : -1 };
+	var justShook = 0;
 
 	return {
 		preload : function() {
@@ -53,21 +54,36 @@ var WorldMapView = (function() {
 			var x = mapLayer.getTileX(player.body.x);
 			var y = mapLayer.getTileY(player.body.y);
 
-			game.debug.text("Player at: " + x + ", " + y, 32, 32);
+			//There is some weird lag/interplay between switching views
+			//and getting the correct tile location of the player... wait
+			//a few iterations before shaking again
+			if(justShook > 0) {
+				justShook++;
+			}
 
 			if(x == 6 && y == 13 && shaking.x != x && shaking.y != y) {
 				shaking.x = 6;
 				shaking.y = 13;
 				game.camera.shake(0.005, 500, false, Phaser.Camera.SHAKE_BOTH, true);
-			} else if(x != 6 || y != 13) {
+				game.camera.onShakeComplete.add(function() {
+					var x = mapLayer.getTileX(player.body.x);
+					var y = mapLayer.getTileY(player.body.y);
+					if(shaking.x == x && shaking.y == y) {
+						viewSwitch("BattleView");
+						justShook = 1;
+					}
+				});
+			} else if((justShook == 0 || justShook > 5) && (x != 6 || y != 13)){
 				shaking.x = -1;
 				shaking.y = -1;
+				justShook = 0;
 			}
 		},
 
 		show : function() {
-			worldViewGroup.visible = true;
 			game.camera.follow(player);
+			game.camera.update();
+			worldViewGroup.visible = true;
 		},
 
 		hide : function() {

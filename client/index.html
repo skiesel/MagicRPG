@@ -7,6 +7,7 @@
 	<script type="text/javascript" src="js/utils.js"></script>
 	<script type="text/javascript" src="js/worldmapview.js"></script>
 	<script type="text/javascript" src="js/inventoryview.js"></script>
+	<script type="text/javascript" src="js/battleview.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -20,7 +21,7 @@
 var game = new Phaser.Game(400, 400, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 var currentView = WorldMapView;
-var views = [WorldMapView, InventoryView];
+var views = [WorldMapView, InventoryView, BattleView];
 
 function preload() {
 	for(var i = 0; i < views.length; i++) {
@@ -47,6 +48,8 @@ function viewSwitch(newView) {
 		currentView = WorldMapView;
 	} else if(newView === "InventoryView") {
 		currentView = InventoryView;
+	} else if(newView === "BattleView") {
+		currentView = BattleView;
 	}
 	currentView.show();
 }
