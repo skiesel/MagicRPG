@@ -1,5 +1,6 @@
 var WorldMapView = (function() {
 	var player, map, mapLayer, cursors, worldViewGroup;
+	var shaking = { x : -1, y : -1 };
 
 	return {
 		preload : function() {
@@ -49,6 +50,19 @@ var WorldMapView = (function() {
 
 		update : function() {
 			handlePlayerMovement();
+			var x = mapLayer.getTileX(player.body.x);
+			var y = mapLayer.getTileY(player.body.y);
+
+			game.debug.text("Player at: " + x + ", " + y, 32, 32);
+
+			if(x == 6 && y == 13 && shaking.x != x && shaking.y != y) {
+				shaking.x = 6;
+				shaking.y = 13;
+				game.camera.shake(0.005, 500, false, Phaser.Camera.SHAKE_BOTH, true);
+			} else if(x != 6 || y != 13) {
+				shaking.x = -1;
+				shaking.y = -1;
+			}
 		},
 
 		show : function() {
