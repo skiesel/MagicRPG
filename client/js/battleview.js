@@ -1,6 +1,7 @@
-	var myCreatureGroup, theirCreatureGroup;
+var meter;
 
 var BattleView = (function() {
+	var myCreatureGroup, theirCreatureGroup;
 	var battleGroup;
 	var battleGrid;
 	var cursors;
@@ -68,20 +69,12 @@ var BattleView = (function() {
 			var barWidth = totalWidth / 2;
 			var barHeight = totalHeight / 30;
 
-			var myHealthbar = myCreatureGroup.add(new Phaser.Graphics(game, 0, 0));
-			myHealthbar.shape = new Phaser.Rectangle(padding, totalHeight / 2, barWidth, barHeight, 5);
-			myHealthbar.min = 0;
-			myHealthbar.max = barWidth;
-			myHealthbar.color = 0xFF0000;
-			drawRoundedRect(myHealthbar, myHealthbar.color);
+			var myHealthbar = new Meter(padding, totalHeight / 2, barWidth, barHeight, 1, 0xFF0000, 0xFFFFFF);
+			myCreatureGroup.add(myHealthbar.getGroup());
 			myCreatureGroup.healthbar = myHealthbar;
 
-			var myMPbar = myCreatureGroup.add(new Phaser.Graphics(game, 0, 0));
-			myMPbar.shape = new Phaser.Rectangle(padding, totalHeight / 2 + barHeight, barWidth, barHeight, 5);
-			myMPbar.min = 0;
-			myMPbar.max = barWidth;
-			myMPbar.color = 0x0000FF;
-			drawRoundedRect(myMPbar, myMPbar.color);
+			var myMPbar = new Meter(padding, totalHeight / 2 + barHeight, barWidth, barHeight, 1, 0x0000FF, 0xFFFFFF);
+			myCreatureGroup.add(myMPbar.getGroup());
 			myCreatureGroup.mpbar = myMPbar;
 
 			myCreatureGroup.label = game.add.text(padding, totalHeight / 2 + 2*barHeight, "Your Fairy", { font: "12px Arial", fill: "#FFFFFF"});;
@@ -98,25 +91,20 @@ var BattleView = (function() {
 			theirCreatureGroup.add(theirCreature);
 			theirCreatureGroup.creature = theirCreature;
 
-			var theirHealthbar = theirCreatureGroup.add(new Phaser.Graphics(game, 0, 0));
-			theirHealthbar.shape = new Phaser.Rectangle(totalWidth - barWidth, totalHeight / 3, barWidth, barHeight, 5);
-			theirHealthbar.min = 0;
-			theirHealthbar.max = barWidth;
-			theirHealthbar.color = 0xFF0000;
-			drawRoundedRect(theirHealthbar, theirHealthbar.color);
+			var theirHealthbar = new Meter(totalWidth - barWidth, totalHeight / 3, barWidth, barHeight, 1, 0xFF0000, 0xFFFFFF);
+			theirCreatureGroup.add(theirHealthbar.getGroup());
 			theirCreatureGroup.healthbar = theirHealthbar;
 
-			var theirMPbar = theirCreatureGroup.add(new Phaser.Graphics(game, 0, 0));
-			theirMPbar.shape = new Phaser.Rectangle(totalWidth - barWidth, totalHeight / 3 + barHeight, barWidth, barHeight, 5);
-			theirMPbar.min = 0;
-			theirMPbar.max = barWidth;
-			theirMPbar.color = 0x0000FF;
-			drawRoundedRect(theirMPbar, theirMPbar.color);
+			var theirMPbar = new Meter(totalWidth - barWidth, totalHeight / 3 + barHeight, barWidth, barHeight, 1, 0x0000FF, 0xFFFFFF);
+			theirCreatureGroup.add(theirMPbar.getGroup());
 			theirCreatureGroup.mpbar = theirMPbar;
 
 			theirCreatureGroup.label = game.add.text(totalWidth - barWidth, totalHeight / 3 + 2*barHeight, "Not Your Fairy", { font: "12px Arial", fill: "#FFFFFF"});;
 			theirCreatureGroup.add(theirCreatureGroup.label);
 
+			// meter = 
+			// meter.draw();
+			// battleGroup.add(meter.getGroup());
 
 			battleGroup.add(battleGrid);
 			battleGroup.add(myCreatureGroup);
@@ -126,49 +114,17 @@ var BattleView = (function() {
 		},
 
 		update : function() {
-			myCreatureGroup.healthbar.clear();
-			myCreatureGroup.healthbar.shape.width += hpChange;
-			if(myCreatureGroup.healthbar.shape.width >= myCreatureGroup.healthbar.max) {
-				myCreatureGroup.healthbar.shape.width = myCreatureGroup.healthbar.max;
-				hpChange *= -1;
-			} else if(myCreatureGroup.healthbar.shape.width <= myCreatureGroup.healthbar.min) {
-				myCreatureGroup.healthbar.shape.width = myCreatureGroup.healthbar.min;
-				hpChange *= -1;
-			}
-        	drawRoundedRect(myCreatureGroup.healthbar, myCreatureGroup.healthbar.color);
+			myCreatureGroup.healthbar.setPercentFilled(0.75);
+			myCreatureGroup.healthbar.draw();
 
-        	myCreatureGroup.mpbar.clear();
-			myCreatureGroup.mpbar.shape.width += mpChange;
-			if(myCreatureGroup.mpbar.shape.width > myCreatureGroup.mpbar.max) {
-				myCreatureGroup.mpbar.shape.width = myCreatureGroup.mpbar.max;
-				mpChange *= -1;
-			} else if(myCreatureGroup.mpbar.shape.width < myCreatureGroup.mpbar.min) {
-				myCreatureGroup.mpbar.shape.width = myCreatureGroup.mpbar.min;
-				mpChange *= -1;
-			}
-        	drawRoundedRect(myCreatureGroup.mpbar, myCreatureGroup.mpbar.color);
+			myCreatureGroup.mpbar.setPercentFilled(0.99);
+			myCreatureGroup.mpbar.draw();
 
-			theirCreatureGroup.healthbar.clear();
-			theirCreatureGroup.healthbar.shape.width += hpChange;
-			if(theirCreatureGroup.healthbar.shape.width >= theirCreatureGroup.healthbar.max) {
-				theirCreatureGroup.healthbar.shape.width = theirCreatureGroup.healthbar.max;
-				hpChange *= -1;
-			} else if(theirCreatureGroup.healthbar.shape.width <= theirCreatureGroup.healthbar.min) {
-				theirCreatureGroup.healthbar.shape.width = theirCreatureGroup.healthbar.min;
-				hpChange *= -1;
-			}
-        	drawRoundedRect(theirCreatureGroup.healthbar, theirCreatureGroup.healthbar.color);
+			theirCreatureGroup.healthbar.setPercentFilled(0.25);
+			theirCreatureGroup.healthbar.draw();
 
-        	theirCreatureGroup.mpbar.clear();
-			theirCreatureGroup.mpbar.shape.width += mpChange;
-			if(theirCreatureGroup.mpbar.shape.width > theirCreatureGroup.mpbar.max) {
-				theirCreatureGroup.mpbar.shape.width = theirCreatureGroup.mpbar.max;
-				mpChange *= -1;
-			} else if(theirCreatureGroup.mpbar.shape.width < theirCreatureGroup.mpbar.min) {
-				theirCreatureGroup.mpbar.shape.width = theirCreatureGroup.mpbar.min;
-				mpChange *= -1;
-			}
-        	drawRoundedRect(theirCreatureGroup.mpbar, theirCreatureGroup.mpbar.color);
+			theirCreatureGroup.mpbar.setPercentFilled(0.5);
+			theirCreatureGroup.mpbar.draw();
 		},
 
 		show : function() {
