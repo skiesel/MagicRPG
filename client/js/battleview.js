@@ -31,22 +31,14 @@ var BattleView = (function() {
 
 			for(var i = 0; i < 1; i++) {
 				for(var j = 0; j < 3; j++) {
-					var rectGraphics = battleGrid.add(new Phaser.Graphics(game, 0, 0));
-
 					var x = totalWidth - (padding * (2-i) + rectWidth * (2-i));
 					var y = totalHeight - (padding * (3-j) + recHeight * (3-j));
-					rectGraphics.actionSlotId = j;
-					rectGraphics.shape = new Phaser.RoundedRectangle(x, y, rectWidth, recHeight, 10);
-					rectGraphics.inputEnabled = true;
-					rectGraphics.events.onInputOver.add(mouseOver, this);
-					rectGraphics.events.onInputOut.add(mouseOff, this);
-					rectGraphics.events.onInputDown.add(mouseClick, this);
-					drawRoundedRect(rectGraphics, 0xFFFFCC);
 
-					var buttonLabel = game.add.text(0, 0, buttonLabels[j], { font: "16px Arial", fill: "#000000"});
-					buttonLabel.x = x + rectWidth / 2 - buttonLabel.width / 2;
-					buttonLabel.y = y + recHeight / 2 - buttonLabel.height / 2;
-					battleGrid.add(buttonLabel);
+					var button = new Button(x, y, rectWidth, recHeight, buttonLabels[j],
+												0xFFFFCC, 0xFFFF22, 0xFFFFFF,
+												mouseOver, mouseOff, mouseClick);
+					button.actionSlotId = j;
+					battleGrid.add(button.getGroup());
 				}
 			}
 
@@ -102,10 +94,6 @@ var BattleView = (function() {
 			theirCreatureGroup.label = game.add.text(totalWidth - barWidth, totalHeight / 3 + 2*barHeight, "Not Your Fairy", { font: "12px Arial", fill: "#FFFFFF"});;
 			theirCreatureGroup.add(theirCreatureGroup.label);
 
-			// meter = 
-			// meter.draw();
-			// battleGroup.add(meter.getGroup());
-
 			battleGroup.add(battleGrid);
 			battleGroup.add(myCreatureGroup);
 			battleGroup.add(theirCreatureGroup);
@@ -115,16 +103,16 @@ var BattleView = (function() {
 
 		update : function() {
 			myCreatureGroup.healthbar.setPercentFilled(0.75);
-			myCreatureGroup.healthbar.draw();
+			myCreatureGroup.healthbar.redraw();
 
 			myCreatureGroup.mpbar.setPercentFilled(0.99);
-			myCreatureGroup.mpbar.draw();
+			myCreatureGroup.mpbar.redraw();
 
 			theirCreatureGroup.healthbar.setPercentFilled(0.25);
-			theirCreatureGroup.healthbar.draw();
+			theirCreatureGroup.healthbar.redraw();
 
 			theirCreatureGroup.mpbar.setPercentFilled(0.5);
-			theirCreatureGroup.mpbar.draw();
+			theirCreatureGroup.mpbar.redraw();
 		},
 
 		show : function() {
@@ -136,19 +124,11 @@ var BattleView = (function() {
 		},
 	}
 
-	function drawRoundedRect(shape, color) {
-		shape.beginFill(color);
-		shape.drawShape(shape.shape);
-		shape.endFill();
-	}
-
 	function mouseOver(item) {
-		drawRoundedRect(item, 0xFFFF22);
 		descriptionLabel.setText(actionDescriptions[item.actionSlotId]);
 	}
 
 	function mouseOff(item) {
-		drawRoundedRect(item, 0xFFFFCC);
 		descriptionLabel.setText("");
 	}
 
