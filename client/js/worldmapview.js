@@ -7,7 +7,7 @@ var WorldMapView = (function() {
 		preload : function() {
 			game.load.spritesheet('dudes', 'assets/dudes.png', 32, 34);
 			game.load.tilemap('tilemap', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
-			game.load.image('tiles', 'assets/tiles.bmp');
+			game.load.image('tiles', 'assets/maptileset.png');
 		},
 
 		create : function() {
@@ -15,7 +15,13 @@ var WorldMapView = (function() {
 
 			map = game.add.tilemap('tilemap');
 			map.addTilesetImage('Tiles', 'tiles');
-			map.setCollision([4,6, 31, 32, 33, 34, 35, 36, 37, 38], true);
+			//The tile array is indexed from 1!!! I don't know why :-(
+			map.setCollision([1,2,3,4,5,13,14,
+							  17,19,,20,21,29,30,
+							  33,34,35,36,43,44,45,46,47,48,
+							  59,61,62,64,
+							  73,74,75,76,77,78,79,80,
+							  89,90], true);
 			mapLayer = map.createLayer(0);
 		    mapLayer.resizeWorld();
 		    // mapLayer.debug = true;
@@ -29,7 +35,7 @@ var WorldMapView = (function() {
 			game.physics.enable(player, Phaser.Physics.ARCADE);
 			game.camera.follow(player);
 
-			player.body.setSize(10, 10, 10, 12);
+			player.body.setSize(20, 21, 7, 7);
 
 			player.body.collideWorldBounds = true;
 		    player.animations.add('down', [0, 1, 2], 10, true);
